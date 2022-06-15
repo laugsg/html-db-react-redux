@@ -19,7 +19,7 @@
     <!-- DB simulation -->
     <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
     <!-- redux thunk -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/redux-thunk/2.4.1/redux-thunk.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/redux-thunk/2.3.0/redux-thunk.min.js"></script>
 
     <title>Todo App With State</title>
   </head>
@@ -108,6 +108,16 @@
           })
         }
       }
+      
+      function handleDeleteGoalAction(goal){
+        return (dispatch) => {
+          dispatch(removeGoalAction(goal.id));
+          return API.deleteGoal(goal.id).catch(() => {
+            dispatch(addGoalAction(goal));
+            alert("An error occured. Try again.");
+          });
+        }
+      }
       //#endregion
 
       //#region 3. Reducers
@@ -184,13 +194,6 @@
         console.groupEnd();
         return result;
       };
-      
-      const thunk = (store) => (next) => (action) => {
-        if (typeof action === 'function'){
-          return action(store.dispatch)
-        }
-        return next(action)
-      }
       //#endregion
 
       const store = Redux.createStore(
@@ -199,7 +202,7 @@
           goals,
           loading,
         }),
-        Redux.applyMiddleware(thunk, checker, logger)
+        Redux.applyMiddleware(ReduxThunk.default, checker, logger)
       );
     </script>
 
@@ -292,11 +295,7 @@
         };
 
         removeItem = (goal) => {
-          this.props.store.dispatch(removeGoalAction(goal.id));
-          return API.deleteGoal(goal.id).catch(() => {
-            this.props.store.dispatch(addGoalAction(goal));
-            alert("An error occured. Try again.");
-          });
+          this.props.store.dispatch(handleDeleteGoalAction(goal))
         };
 
         render() {
