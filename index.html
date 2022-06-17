@@ -241,6 +241,20 @@
         console.groupEnd();
         return result;
       };
+
+      /** Thunk & Asynchronous Actions
+       * Asynchronous Actions requires a thunk
+       * because they returns a function which argument is dispatch,
+       * Thunk will filter Actions based in their type
+       * to pass them or not the dispatch method from Store,
+       * Async Action will receive dispatch and execute it.
+       */
+      const thunk = (store) => (next) => (action) => {
+        if (typeof action === 'function'){
+          return action(store.dispatch)
+        }
+        return next(action)
+      }
       //#endregion
 
       const store = Redux.createStore(
